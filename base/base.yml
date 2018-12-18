@@ -1,0 +1,52 @@
+##########################################################################
+# 部署配置文件(base)
+# 本配置文件(xx.yml)中的变量(${xxx})是从同级目录下的.env文件中读取的
+##########################################################################
+# compose支持的版本2
+version: "2"
+services:
+  # http
+  http:
+    image: ${IMAGE_HTTP}
+    container_name: "http.${PRODUCT_NAME}.${COMPANY_NAME}"
+    hostname: "http.${PRODUCT_NAME}.${COMPANY_NAME}"
+    restart: "always"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./volume/http/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./volume/http/conf/server.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./volume/http/data:/usr/share/nginx/html:ro
+    ports:
+      - "80:80"
+    networks:
+      mynet:
+        ipv4_address: 172.16.100.10
+  # ftp
+  ftp:
+    image: ${IMAGE_FTP}
+    container_name: "ftp.${PRODUCT_NAME}.${COMPANY_NAME}"
+    hostname: "ftp.${PRODUCT_NAME}.${COMPANY_NAME}"
+    restart: "always"
+    environment:
+      - PUBLICHOST=localhost
+      - FTP_USER_NAME=test
+      - FTP_USER_PASS=test
+      - FTP_USER_HOME=/home/test
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./volume/ftp/passwd:/etc/pure-ftpd/passwd:rw
+      - ./volume/ftp/data:/home/test/:rw
+      - ./volume/ftp/ssl:/etc/ssl/private/:rw
+    ports:
+      - "21:21"
+      - "30000-30009:30000-30009"
+    networks:
+      mynet:
+        ipv4_address: 172.16.100.20
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.100.0/24"
