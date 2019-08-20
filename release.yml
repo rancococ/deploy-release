@@ -16,6 +16,8 @@ services:
       - ./volume/http/conf/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./volume/http/conf/server.conf:/etc/nginx/conf.d/default.conf:ro
       - ./volume/http/data:/usr/share/nginx/html:ro
+    extra_hosts:
+      - "http.${PRODUCT_NAME}.${COMPANY_NAME}:172.16.100.10"
     ports:
       - "80:80"
     networks:
@@ -37,6 +39,8 @@ services:
       - ./volume/ftp/passwd:/etc/pure-ftpd/passwd:rw
       - ./volume/ftp/data:/home/test/:rw
       - ./volume/ftp/ssl:/etc/ssl/private/:rw
+    extra_hosts:
+      - "ftp.${PRODUCT_NAME}.${COMPANY_NAME}:172.16.100.20"
     ports:
       - "21:21"
       - "30000-30009:30000-30009"
